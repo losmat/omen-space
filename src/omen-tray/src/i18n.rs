@@ -124,6 +124,17 @@ fn translate_tr(key: &'static str) -> &'static str {
         "tt_gpu" => "GPU",
         "tt_gpu_hybrid" => "Hibrit (Hybrid)",
         "tt_gpu_discrete" => "Harici (dGPU)",
+
+        // Logs / notifications (dynamic values are formatted by the caller)
+        "log_power_set" => "Güç profili ayarlandı",
+        "log_power_err" => "Güç profili değiştirilemedi",
+        "log_fan_set" => "Fan modu ayarlandı",
+        "log_fan_err" => "Fan modu değiştirilemedi",
+        "log_gpu_set" => "GPU modu ayarlandı",
+        "log_gpu_err" => "GPU modu değiştirilemedi",
+        "log_gpu_reboot" => "GPU modunun etkin olması için sistemi yeniden başlatmanız gerekiyor.",
+        "log_tray_running" => "omen-tray zaten çalışıyor, ikinci örnek sonlandırılıyor.",
+        "log_tray_start" => "omen-tray başlatılıyor...",
         
         _ => translate_en(key),
     }
@@ -152,6 +163,17 @@ fn translate_en(key: &'static str) -> &'static str {
         "tt_gpu" => "GPU",
         "tt_gpu_hybrid" => "Hybrid",
         "tt_gpu_discrete" => "Discrete (dGPU)",
+
+        // Logs / notifications (dynamic values are formatted by the caller)
+        "log_power_set" => "Power profile set",
+        "log_power_err" => "Failed to change power profile",
+        "log_fan_set" => "Fan mode set",
+        "log_fan_err" => "Failed to change fan mode",
+        "log_gpu_set" => "GPU mode set",
+        "log_gpu_err" => "Failed to change GPU mode",
+        "log_gpu_reboot" => "You need to reboot for the GPU mode to take effect.",
+        "log_tray_running" => "omen-tray is already running, terminating second instance.",
+        "log_tray_start" => "Starting omen-tray...",
         
         _ => key,
     }

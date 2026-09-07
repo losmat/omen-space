@@ -365,8 +365,8 @@ async fn set_power_profile(profile: &str) {
     if let Ok(conn) = get_conn().await {
         if let Ok(proxy) = PowerProxy::new(&conn).await {
             match proxy.set_power_profile(profile).await {
-                Ok(resp) => info!("Güç profili ayarlandı ({}) -> {}", profile, resp),
-                Err(e) => error!("Güç profili değiştirilemedi: {}", e),
+                Ok(resp) => info!("{} ({}) -> {}", t("log_power_set"), profile, resp),
+                Err(e) => error!("{}: {}", t("log_power_err"), e),
             }
         }
     }
@@ -376,8 +376,8 @@ async fn set_fan_mode(mode: &str) {
     if let Ok(conn) = get_conn().await {
         if let Ok(proxy) = FanProxy::new(&conn).await {
             match proxy.set_fan_mode(mode).await {
-                Ok(resp) => info!("Fan modu ayarlandı ({}) -> {}", mode, resp),
-                Err(e) => error!("Fan modu değiştirilemedi: {}", e),
+                Ok(resp) => info!("{} ({}) -> {}", t("log_fan_set"), mode, resp),
+                Err(e) => error!("{}: {}", t("log_fan_err"), e),
             }
         }
     }
@@ -388,17 +388,17 @@ async fn set_gpu_mode(mode: &str) {
         if let Ok(proxy) = MuxProxy::new(&conn).await {
             match proxy.set_gpu_mode(mode).await {
                 Ok(resp) => {
-                    info!("GPU modu ayarlandı ({}) -> {}", mode, resp);
+                    info!("{} ({}) -> {}", t("log_gpu_set"), mode, resp);
                     if resp.contains("REBOOT") {
                         let _ = Command::new("notify-send")
                             .arg("OMEN Space")
-                            .arg("GPU modunun etkin olması için sistemi yeniden başlatmanız gerekiyor.")
+                            .arg(t("log_gpu_reboot"))
                             .arg("-i")
                             .arg("dialog-warning")
                             .spawn();
                     }
                 },
-                Err(e) => error!("GPU modu değiştirilemedi: {}", e),
+                Err(e) => error!("{}: {}", t("log_gpu_err"), e),
             }
         }
     }
@@ -406,18 +406,19 @@ async fn set_gpu_mode(mode: &str) {
 
 #[tokio::main]
 async fn main() {
+    // Init language before any user-visible string (incl. the lock error below).
+    i18n::init();
+
     let _lock_file = match acquire_single_instance_lock() {
         Some(file) => file,
         None => {
-            eprintln!("omen-tray zaten çalışıyor, ikinci örnek sonlandırılıyor.");
+            eprintln!("{}", t("log_tray_running"));
             return;
         }
     };
 
     env_logger::init();
-    info!("omen-tray başlatılıyor...");
-
-    i18n::init();
+    info!("{}", t("log_tray_start"));
 
     RUNTIME
         .set(tokio::runtime::Handle::current())

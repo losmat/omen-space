@@ -154,10 +154,10 @@ impl ksni::Tray for Tray {
             .into(),
             MenuItem::Separator,
             SubMenu {
-                label: t("power_profile").into(),
+                label: format!("⚡ {}", t("power_profile")),
                 submenu: vec![
                     CheckmarkItem {
-                        label: t("perf").into(),
+                        label: format!("🔥 {}", t("perf")).into(),
                         checked: cur_power == "performance",
                         activate: Box::new(|tray: &mut Self| {
                             tray.power_profile = "performance".into();
@@ -169,7 +169,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: t("balanced").into(),
+                        label: format!("⚖️ {}", t("balanced")).into(),
                         checked: cur_power == "balanced",
                         activate: Box::new(|tray: &mut Self| {
                             tray.power_profile = "balanced".into();
@@ -181,7 +181,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: t("eco").into(),
+                        label: format!("🍃 {}", t("eco")).into(),
                         checked: cur_power == "power-saver" || cur_power == "eco",
                         activate: Box::new(|tray: &mut Self| {
                             tray.power_profile = "power-saver".into();
@@ -197,10 +197,10 @@ impl ksni::Tray for Tray {
             }
             .into(),
             SubMenu {
-                label: t("fan_mode").into(),
+                label: format!("❄️ {}", t("fan_mode")).into(),
                 submenu: vec![
                     CheckmarkItem {
-                        label: t("auto").into(),
+                        label: format!("🤖 {}", t("auto")).into(),
                         checked: cur_fan == "auto",
                         activate: Box::new(|tray: &mut Self| {
                             tray.fan_mode = "auto".into();
@@ -212,7 +212,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: t("max").into(),
+                        label: format!("🌪️ {}", t("max")).into(),
                         checked: cur_fan == "max",
                         activate: Box::new(|tray: &mut Self| {
                             tray.fan_mode = "max".into();
@@ -224,7 +224,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: t("ec").into(),
+                        label: format!("⚙️ {}", t("ec")).into(),
                         checked: cur_fan == "ec",
                         activate: Box::new(|tray: &mut Self| {
                             tray.fan_mode = "ec".into();
@@ -240,10 +240,10 @@ impl ksni::Tray for Tray {
             }
             .into(),
             SubMenu {
-                label: t("gpu_mode").into(),
+                label: format!("🎮 {}", t("gpu_mode")).into(),
                 submenu: vec![
                     CheckmarkItem {
-                        label: t("hybrid").into(),
+                        label: format!("🔀 {}", t("hybrid")).into(),
                         checked: cur_gpu == "hybrid",
                         activate: Box::new(|tray: &mut Self| {
                             tray.gpu_mode = "hybrid".into();
@@ -255,7 +255,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: t("discrete").into(),
+                        label: format!("🖥️ {}", t("discrete")).into(),
                         checked: cur_gpu == "discrete",
                         activate: Box::new(|tray: &mut Self| {
                             tray.gpu_mode = "discrete".into();
@@ -272,7 +272,7 @@ impl ksni::Tray for Tray {
             .into(),
             MenuItem::Separator,
             StandardItem {
-                label: t("exit").into(),
+                label: format!("❌ {}", t("exit")).into(),
                 icon_name: "application-exit".into(),
                 activate: Box::new(|_| {
                     let _ = Command::new("pkill").arg("-TERM").arg("-x").arg("omen-gui").output();

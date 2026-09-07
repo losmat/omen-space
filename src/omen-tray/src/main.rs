@@ -5,6 +5,8 @@ use std::process::Command;
 use std::sync::OnceLock;
 use zbus::{Connection, Result as ZbusResult};
 
+mod i18n;
+
 static RUNTIME: OnceLock<tokio::runtime::Handle> = OnceLock::new();
 
 fn spawn_task<F>(f: F)
@@ -107,19 +109,21 @@ impl ksni::Tray for Tray {
 
     fn tool_tip(&self) -> ksni::ToolTip {
         let p_label = match self.power_profile.as_str() {
-            "performance" => "Performans",
-            "power-saver" | "eco" => "Eko",
-            _ => "Dengeli",
+            "performance" => i18n::t("power_performance"),
+            "power-saver" | "eco" => i18n::t("power_eco"),
+            _ => i18n::t("power_balanced"),
         };
         let f_label = match self.fan_mode.as_str() {
-            "max" => "Maksimum",
-            "ec" => "EC (Donanım)",
-            "custom" => "Özel",
-            _ => "Otomatik",
+            "max" => i18n::t("fan_max"),
+            "ec" => i18n::t("fan_ec"),
+            "custom" => i18n::t("fan_custom"),
+            _ => i18n::t("fan_auto"),
         };
         ksni::ToolTip {
             title: "OMEN Space".into(),
-            description: format!("Güç: {}\nFan: {}", p_label, f_label),
+            description: i18n::t("tooltip_fmt")
+                .replacen("{}", p_label, 1)
+                .replacen("{}", f_label, 1),
             icon_name: "omenspace".into(),
             ..Default::default()
         }
@@ -135,7 +139,7 @@ impl ksni::Tray for Tray {
 
         vec![
             StandardItem {
-                label: "OMENSpace'i Aç".into(),
+                label: i18n::t("tray_open").into(),
                 icon_name: "omenspace".into(),
                 activate: Box::new(|_| {
                     spawn_gui();
@@ -145,10 +149,10 @@ impl ksni::Tray for Tray {
             .into(),
             MenuItem::Separator,
             SubMenu {
-                label: "⚡ Güç Profili".into(),
+                label: i18n::t("tray_power").into(),
                 submenu: vec![
                     CheckmarkItem {
-                        label: "🔥 Performans".into(),
+                        label: i18n::t("tray_perf").into(),
                         checked: cur_power == "performance",
                         activate: Box::new(|tray: &mut Self| {
                             tray.power_profile = "performance".into();
@@ -160,7 +164,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: "⚖️ Dengeli".into(),
+                        label: i18n::t("tray_balanced").into(),
                         checked: cur_power == "balanced",
                         activate: Box::new(|tray: &mut Self| {
                             tray.power_profile = "balanced".into();
@@ -172,7 +176,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: "🍃 Eko".into(),
+                        label: i18n::t("tray_eco").into(),
                         checked: cur_power == "power-saver" || cur_power == "eco",
                         activate: Box::new(|tray: &mut Self| {
                             tray.power_profile = "power-saver".into();
@@ -188,10 +192,10 @@ impl ksni::Tray for Tray {
             }
             .into(),
             SubMenu {
-                label: "❄️ Fan Modu".into(),
+                label: i18n::t("tray_fan").into(),
                 submenu: vec![
                     CheckmarkItem {
-                        label: "🤖 Otomatik".into(),
+                        label: i18n::t("tray_auto").into(),
                         checked: cur_fan == "auto",
                         activate: Box::new(|tray: &mut Self| {
                             tray.fan_mode = "auto".into();
@@ -203,7 +207,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: "🌪️ Maksimum".into(),
+                        label: i18n::t("tray_max").into(),
                         checked: cur_fan == "max",
                         activate: Box::new(|tray: &mut Self| {
                             tray.fan_mode = "max".into();
@@ -215,7 +219,7 @@ impl ksni::Tray for Tray {
                     }
                     .into(),
                     CheckmarkItem {
-                        label: "⚙️ EC (Donanım)".into(),
+                        label: i18n::t("tray_ec").into(),
                         checked: cur_fan == "ec",
                         activate: Box::new(|tray: &mut Self| {
                             tray.fan_mode = "ec".into();
@@ -232,7 +236,7 @@ impl ksni::Tray for Tray {
             .into(),
             MenuItem::Separator,
             StandardItem {
-                label: "❌ Çıkış".into(),
+                label: i18n::t("tray_exit").into(),
                 icon_name: "application-exit".into(),
                 activate: Box::new(|_| {
                     let _ = Command::new("pkill").arg("-TERM").arg("-x").arg("omen-gui").output();
@@ -300,8 +304,13 @@ async fn set_power_profile(profile: &str) {
     if let Ok(conn) = get_conn().await {
         if let Ok(proxy) = PowerProxy::new(&conn).await {
             match proxy.set_power_profile(profile).await {
-                Ok(resp) => info!("Güç profili ayarlandı ({}) -> {}", profile, resp),
-                Err(e) => error!("Güç profili değiştirilemedi: {}", e),
+                Ok(resp) => info!(
+                    "{}",
+                    i18n::t("log_power_ok")
+                        .replacen("{}", profile, 1)
+                        .replacen("{}", &resp, 1)
+                ),
+                Err(e) => error!("{} {}", i18n::t("log_power_err"), e),
             }
         }
     }
@@ -311,8 +320,13 @@ async fn set_fan_mode(mode: &str) {
     if let Ok(conn) = get_conn().await {
         if let Ok(proxy) = FanProxy::new(&conn).await {
             match proxy.set_fan_mode(mode).await {
-                Ok(resp) => info!("Fan modu ayarlandı ({}) -> {}", mode, resp),
-                Err(e) => error!("Fan modu değiştirilemedi: {}", e),
+                Ok(resp) => info!(
+                    "{}",
+                    i18n::t("log_fan_ok")
+                        .replacen("{}", mode, 1)
+                        .replacen("{}", &resp, 1)
+                ),
+                Err(e) => error!("{} {}", i18n::t("log_fan_err"), e),
             }
         }
     }
@@ -323,13 +337,13 @@ async fn main() {
     let _lock_file = match acquire_single_instance_lock() {
         Some(file) => file,
         None => {
-            eprintln!("omen-tray zaten çalışıyor, ikinci örnek sonlandırılıyor.");
+            eprintln!("{}", i18n::t("log_already_running"));
             return;
         }
     };
 
     env_logger::init();
-    info!("omen-tray başlatılıyor...");
+    info!("{}", i18n::t("log_starting"));
 
     RUNTIME
         .set(tokio::runtime::Handle::current())

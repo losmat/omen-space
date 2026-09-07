@@ -383,7 +383,7 @@ fn translate_tr(key: &'static str) -> &'static str {
         // Settings Page
         "settings_desc" => "OmenSpace daemon & uygulama yapılandırması",
         "hw_config_group" => "Donanım Yapılandırması",
-        "appearance_and_lang" => "Görünüm & Dil",
+        "appearance_and_lang" => "Görünüm ve Dil",
         "appearance_mode" => "Tema Görünümü",
         "appearance_mode_sub" => "Uygulama temasını belirleyin (Aydınlık / Karanlık)",
         "language_row_title" => "Uygulama Dili (Language)",
@@ -711,7 +711,7 @@ fn translate_en(key: &'static str) -> &'static str {
         // Settings Page
         "settings_desc" => "OmenSpace daemon & application configuration",
         "hw_config_group" => "Hardware Configuration",
-        "appearance_and_lang" => "Appearance & Language",
+        "appearance_and_lang" => "Appearance and Language",
         "appearance_mode" => "Theme Appearance",
         "appearance_mode_sub" => "Set the application theme (Light / Dark)",
         "language_row_title" => "Application Language / Dil",
